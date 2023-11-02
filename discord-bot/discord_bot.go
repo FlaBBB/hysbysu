@@ -43,7 +43,7 @@ func (bot *discordBot) SendError(message string) error {
 		Description: "```\n" + message + "\n```",
 		Timestamp:   time.Now().Format(time.RFC3339),
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: "tolong mention @elianiva kalo orangnya belom ngerespon",
+			Text: "tolong mention @FlaB kalo orangnya belom ngerespon",
 		},
 	}
 
