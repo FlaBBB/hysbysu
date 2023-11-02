@@ -34,7 +34,7 @@ jobs:
           cd ./discord-bot/
           ls -la
           go get -v -t -d ./...
-          go build main.go
+          go build ./...
 
       - name: Run test & coverage
         run: |
