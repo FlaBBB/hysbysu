@@ -30,10 +30,11 @@ jobs:
           extra_args: --debug --only-verified
 
       - name: Move DIR
-        run: cd discord-bot
+        run: cd ./discord-bot/
 
       - name: Build
         run: |
+          ls -la
           go get -v -t -d ./...
           go build main.go
 
@@ -54,6 +55,7 @@ jobs:
       - uses: codecov/codecov-action@v3
 
   build-image:
+    needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
