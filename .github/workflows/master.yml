@@ -29,8 +29,13 @@ jobs:
           head: HEAD
           extra_args: --debug --only-verified
 
+      - name: Move DIR
+        run: cd discord-bot
+
       - name: Build
-        run: go build discord-bot/main.go
+        run: |
+          go get -v -t -d ./...
+          go build main.go
 
       - name: Run test & coverage
         run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
@@ -79,7 +84,7 @@ jobs:
       - name: Build and push docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./discord-bot/
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
