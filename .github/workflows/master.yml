@@ -29,17 +29,17 @@ jobs:
           head: HEAD
           extra_args: --debug --only-verified
 
-      - name: Move DIR
-        run: cd ./discord-bot/
-
       - name: Build
         run: |
+          cd ./discord-bot/
           ls -la
           go get -v -t -d ./...
           go build main.go
 
       - name: Run test & coverage
-        run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
+        run: |
+          cd ./discord-bot/
+          go test -v -coverprofile=coverage.out -covermode=atomic ./...
         env:
           ENVIRONMENT: development
           TZ: UTC
