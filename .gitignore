@@ -36,3 +36,4 @@ snapshots/*
 !snapshots/history.json
 
 .env
+discord-bot/fly.toml
