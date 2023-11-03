@@ -68,9 +68,8 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DISCORD_TOKEN }}
 
       - name: Extract metadata for docker
         id: meta
@@ -82,11 +81,38 @@ jobs:
           tags: |
             type=edge
             type=sha
+            
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Build and push docker image
         uses: docker/build-push-action@v3
         with:
           context: ./discord-bot/
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+  deploy:
+    needs: build-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_UNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            whoami
+            sudo docker stop ${{ env.IMAGE_NAME }} || true && sudo docker rm ${{ env.IMAGE_NAME }} || true
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            sudo docker run -d -p 3000:3000 --restart=always --name ${{ env.IMAGE_NAME }} \
+            -e NOTIFICATION_API_SECRET=${{ secrets.NOTIFICATION_API_SECRET }} \
+            -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
+            -e DISCORD_CHANNEL_ID=${{ secrets.DISCORD_CHANNEL_ID }} \
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
