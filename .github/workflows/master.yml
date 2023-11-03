@@ -90,7 +90,7 @@ jobs:
         with:
           context: ./discord-bot/
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ vars.APP_NAME }}:latest
   deploy:
     needs: build-image
     runs-on: ubuntu-latest
@@ -109,10 +109,10 @@ jobs:
           port: 22
           script: |
             whoami
-            sudo docker stop ${{ env.IMAGE_NAME }} || true && sudo docker rm ${{ env.IMAGE_NAME }} || true
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            sudo docker run -d -p 3000:3000 --restart=always --name ${{ env.IMAGE_NAME }} \
+            sudo docker stop ${{ env.IMAGE_NAME }} || true && sudo docker rm ${{ vars.APP_NAME }} || true
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.APP_NAME }}:latest
+            sudo docker run -d -p 3000:3000 --restart=always --name ${{ vars.APP_NAME }} \
             -e NOTIFICATION_API_SECRET=${{ secrets.NOTIFICATION_API_SECRET }} \
             -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
             -e DISCORD_CHANNEL_ID=${{ secrets.DISCORD_CHANNEL_ID }} \
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/${{ vars.APP_NAME }}:latest
